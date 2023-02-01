@@ -1,0 +1,25 @@
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: method-route
+spec:
+  http:
+    - name: method
+      match:
+        hosts:
+          - local.navendu.me
+        paths:
+          - /api
+      backends:
+      - serviceName: bare-minimum-api-v1
+        servicePort: 8080
+        weight: 50
+      - serviceName: bare-minimum-api-v2
+        servicePort: 8080
+        weight: 50
+      plugins:
+        - name: limit-count
+          enable: true
+          config:
+            count: 10
+            time_window: 10

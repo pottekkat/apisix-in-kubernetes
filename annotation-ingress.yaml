@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-routes
+  annotations:
+    k8s.apisix.apache.org/allowlist-source-range: "172.17.0.1"
+spec:
+  ingressClassName: apisix
+  rules:
+    - host: local.navendu.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: bare-minimum-api-v1
+                port:
+                  number: 8080
+            path: /v1
+            pathType: Exact
+          - backend:
+              service:
+                name: bare-minimum-api-v2
+                port:
+                  number: 8080
+            path: /v2
+            pathType: Exact

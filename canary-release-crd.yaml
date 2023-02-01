@@ -1,0 +1,17 @@
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: canary-release
+spec:
+  http:
+    - name: route-v1
+      match:
+        paths:
+          - /*
+      backends:
+        - serviceName: bare-minimum-api-v1
+          servicePort: 8080
+          weight: 100
+        - serviceName: bare-minimum-api-v2
+          servicePort: 8080
+          weight: 0
