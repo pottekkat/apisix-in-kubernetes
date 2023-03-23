@@ -11,7 +11,7 @@ spec:
       backends:
         - serviceName: bare-minimum-api-v1
           servicePort: 8080
-          weight: 100
+          weight: 50
         - serviceName: bare-minimum-api-v2
           servicePort: 8080
-          weight: 0
+          weight: 50

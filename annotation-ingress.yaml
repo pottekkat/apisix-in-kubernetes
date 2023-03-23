@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: api-routes
   annotations:
-    k8s.apisix.apache.org/allowlist-source-range: "172.17.0.1"
+    k8s.apisix.apache.org/allowlist-source-range: "182.18.0.1"
 spec:
   ingressClassName: apisix
   rules:
