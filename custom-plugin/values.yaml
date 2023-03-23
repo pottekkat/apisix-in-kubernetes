@@ -1,0 +1,343 @@
+global:
+  imagePullSecrets: []
+
+apisix:
+  enabled: true
+  enableIPv6: true
+  enableServerTokens: true
+
+  setIDFromPodUID: false
+
+  customLuaSharedDicts: []
+  
+  luaModuleHook:
+    enabled: false
+    luaPath: ""
+    hookPoint: ""
+    configMapRef:
+      name: ""
+      mounts:
+        - key: ""
+          path: ""
+
+  httpRouter: radixtree_uri
+
+  enableCustomizedConfig: false
+  customizedConfig: {}
+
+  image:
+    repository: apache/apisix
+    pullPolicy: IfNotPresent
+    tag: 3.2.0-debian
+
+  kind: Deployment
+  replicaCount: 1
+
+  priorityClassName: ""
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 90%
+    maxUnavailable: 1
+  resources: {}
+
+  hostNetwork: false
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  timezone: ""
+
+  extraEnvVars: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+rbac:
+  create: false
+
+deployment:
+  mode: traditional
+  role: "traditional"
+
+  controlPlane:
+    confServerPort: "9280"
+    certsSecret: ""
+    cert: ""
+    certKey: ""
+
+  dataPlane:
+    controlPlane:
+      host: []
+      prefix: "/apisix"
+      timeout: 30
+
+  certs:
+    certsSecret: ""
+    cert: ""
+    cert_key: ""
+
+    mTLSCACertSecret: ""
+    mTLSCACert: ""
+
+gateway:
+  type: NodePort
+
+  externalTrafficPolicy: Cluster
+  externalIPs: []
+  http:
+    enabled: true
+    servicePort: 80
+    containerPort: 9080
+    additionalContainerPorts: []
+  tls:
+    enabled: false
+    servicePort: 443
+    containerPort: 9443
+    additionalContainerPorts: []
+    existingCASecret: ""
+    certCAFilename: ""
+    http2:
+      enabled: true
+    sslProtocols: "TLSv1.2 TLSv1.3"
+  stream:
+    enabled: false
+    only: false
+    tcp: []
+    udp: []
+  ingress:
+    enabled: false
+    annotations: {}
+    hosts:
+      - host: apisix.local
+        paths: []
+    tls: []
+  labelsOverride: {}
+admin:
+  enabled: true
+  type: ClusterIP
+  externalIPs: []
+  ip: 0.0.0.0
+  port: 9180
+  servicePort: 9180
+  cors: true
+  credentials:
+    admin: edd1c9f034335f136f87ad84b625c8f1
+    viewer: 4054f7cf07e344346cd3f287985e76a2
+
+  allow:
+    ipList:
+      - 127.0.0.1/24
+  ingress:
+    enabled: false
+    annotations:
+      {}
+    hosts:
+      - host: apisix-admin.local
+        paths:
+          - "/apisix"
+    tls: []
+
+nginx:
+  workerRlimitNofile: "20480"
+  workerConnections: "10620"
+  workerProcesses: auto
+  enableCPUAffinity: true
+  envs: []
+
+plugins:
+  - api-breaker
+  - authz-keycloak
+  - basic-auth
+  - batch-requests
+  - consumer-restriction
+  - cors
+  - echo
+  - fault-injection
+  - file-logger
+  - grpc-transcode
+  - grpc-web
+  - hmac-auth
+  - http-logger
+  - ip-restriction
+  - ua-restriction
+  - jwt-auth
+  - kafka-logger
+  - key-auth
+  - limit-conn
+  - limit-count
+  - limit-req
+  - node-status
+  - openid-connect
+  - authz-casbin
+  - prometheus
+  - proxy-cache
+  - proxy-mirror
+  - proxy-rewrite
+  - redirect
+  - referer-restriction
+  - request-id
+  - request-validation
+  - response-rewrite
+  - serverless-post-function
+  - serverless-pre-function
+  - sls-logger
+  - syslog
+  - tcp-logger
+  - udp-logger
+  - uri-blocker
+  - wolf-rbac
+  - zipkin
+  - traffic-split
+  - gzip
+  - real-ip
+  - ext-plugin-pre-req
+  - ext-plugin-post-req
+  - custom-logger
+stream_plugins:
+  - mqtt-proxy
+  - ip-restriction
+  - limit-conn
+
+pluginAttrs: {}
+
+extPlugin:
+  enabled: false
+  cmd: ["/path/to/apisix-plugin-runner/runner", "run"]
+
+wasmPlugins:
+  enabled: false
+  plugins: []
+
+customPlugins:
+  enabled: true
+  plugins:
+    - name: "custom-response"
+      attrs: {}
+      configMap:
+        name: "custom-response-config"
+        mounts:
+          - key: "custom-response.lua"
+            path: "/usr/local/apisix/apisix/plugins/custom-response.lua"
+
+updateStrategy: {}
+extraVolumes: []
+extraVolumeMounts: []
+extraInitContainers: []
+
+discovery:
+  enabled: false
+  registry: {}
+
+logs:
+  enableAccessLog: true
+  accessLog: "/dev/stdout"
+  accessLogFormat: '$remote_addr - $remote_user [$time_local] $http_host \"$request\" $status $body_bytes_sent $request_time \"$http_referer\" \"$http_user_agent\" $upstream_addr $upstream_status $upstream_response_time \"$upstream_scheme://$upstream_host$upstream_uri\"'
+  accessLogFormatEscape: default
+  errorLog: "/dev/stderr"
+  errorLogLevel: "warn"
+
+dns:
+  resolvers:
+    - 127.0.0.1
+    - 172.20.0.10
+    - 114.114.114.114
+    - 223.5.5.5
+    - 1.1.1.1
+    - 8.8.8.8
+  validity: 30
+  timeout: 5
+
+initContainer:
+  image: busybox
+  tag: 1.28
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+configurationSnippet:
+  main: |
+
+  httpStart: |
+
+  httpEnd: |
+
+  httpSrv: |
+
+  httpAdmin: |
+
+  stream: |
+
+serviceMonitor:
+  enabled: false
+  namespace: ""
+  name: ""
+  interval: 15s
+  path: /apisix/prometheus/metrics
+  metricPrefix: apisix_
+  containerPort: 9091
+  labels: {}
+  annotations: {}
+
+etcd:
+  enabled: true
+  host:
+    - http://etcd.host:2379
+  user: ""
+  password: ""
+  prefix: "/apisix"
+  timeout: 30
+
+  auth:
+    rbac:
+      create: false
+      rootPassword: ""
+    tls:
+      enabled: false
+      existingSecret: ""
+      certFilename: ""
+      certKeyFilename: ""
+      verify: true
+      sni: ""
+
+  service:
+    port: 2379
+
+  replicaCount: 3
+
+dashboard:
+  enabled: false
+  config:
+    conf:
+      etcd:
+        endpoints:
+          - apisix-etcd:2379
+        prefix: "/apisix"
+        username: ~
+        password: ~
+
+ingress-controller:
+  enabled: true
+  config:
+    apisix:
+      adminAPIVersion: "v3"
+      serviceNamespace: ingress-apisix
+
+vault:
+  enabled: false
+  host: ""
+  timeout: 10
+  token: ""
+  prefix: ""

@@ -1,0 +1,20 @@
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: api-route
+spec:
+  http:
+    - name: route
+      match:
+        hosts:
+          - local.navendu.me
+        paths:
+          - /api
+      backends:
+        - serviceName: bare-minimum-api
+          servicePort: 8080
+      plugins:
+        - name: custom-response
+          enable: true
+          config:
+            body: "Hello from your custom Plugin!"
