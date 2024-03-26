@@ -19,6 +19,17 @@ apisix:
       mounts:
         - key: ""
           path: ""
+  
+  customPlugins:
+    enabled: true
+    plugins:
+    - name: "custom-response"
+      attrs: {}
+      configMap:
+        name: "custom-response-config"
+        mounts:
+          - key: "custom-response.lua"
+            path: "/usr/local/apisix/apisix/plugins/custom-response.lua"
 
   httpRouter: radixtree_uri
 
@@ -216,17 +227,6 @@ extPlugin:
 wasmPlugins:
   enabled: false
   plugins: []
-
-customPlugins:
-  enabled: true
-  plugins:
-    - name: "custom-response"
-      attrs: {}
-      configMap:
-        name: "custom-response-config"
-        mounts:
-          - key: "custom-response.lua"
-            path: "/usr/local/apisix/apisix/plugins/custom-response.lua"
 
 updateStrategy: {}
 extraVolumes: []
